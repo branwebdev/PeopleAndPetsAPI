@@ -1,0 +1,16 @@
+﻿<div class="row">
+    <div class="col-md-4">
+        @using (Html.BeginForm("Search", "Home", FormMethod.Post))
+        {
+            <div>
+                <label>Type and click search to retrieve the pet owners via their names. To retrieve all, click on search while the search bar is empty</label>
+            </div>
+            <br/>
+            <div class="form-group">
+                <input type="text" name="searchTerm" class="form-control" placeholder="Enter name to search">
+            </div>
+            <br />
+            <button type="submit" class="btn btn-primary">Search</button>
+        }
+    </div>
+</div>

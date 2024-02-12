@@ -1,0 +1,45 @@
+﻿@model PeopleAndPetsMVC.Models.OwnersPetsViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>@Model.OwnerName's pets</h1>
+
+@Html.Partial("~/Views/Partial/SearchBarPets.cshtml", Model)
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayName("Name")
+            </th>
+            <th>
+                @Html.DisplayName("Type")
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Pets) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Type)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "LoadEditPetPage", new { id = item.Id, ownerId = Model.OwnerId, ownerName = Model.OwnerName }) |
+                @Html.ActionLink("Delete", "DeletePet", new { id = item.Id, ownerId = Model.OwnerId, ownerName = Model.OwnerName })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+@Html.ActionLink("Add New Pet", "LoadAddPetPage", "Pets", new{ ownerId = Model.OwnerId, ownerName = Model.OwnerName })
+
+<div>
+    @Html.ActionLink("Back to home", "Index", "Home")
+</div>
