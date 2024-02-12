@@ -15,6 +15,7 @@ namespace PeopleAndPetsMVC.Controllers
 
         private readonly HttpClient _httpClient;
 
+        //Test comment
         public HomeController(ILogger<HomeController> logger)
         {
             _httpClient = new HttpClient();
