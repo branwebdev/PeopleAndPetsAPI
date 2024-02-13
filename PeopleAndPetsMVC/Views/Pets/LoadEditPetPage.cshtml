@@ -1,4 +1,8 @@
-﻿@model PeopleAndPetsAPI.Entities.PetViewModel
+﻿@*
+    The pet page that allows the users to edit the pet.
+*@
+
+@model PeopleAndPetsAPI.Entities.PetViewModel
 
 @{
     int ownerId = ViewData["OwnerId"] != null ? (int)ViewData["OwnerId"] : 0;
