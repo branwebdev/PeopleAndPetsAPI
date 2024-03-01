@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PeopleAndPetsAPI.Data;
 using PeopleAndPetsAPI.Entities;
+using PeopleAndPetsAPI.Services;
 
 namespace PeopleAndPetsAPI.Controllers
 {
@@ -13,11 +14,11 @@ namespace PeopleAndPetsAPI.Controllers
     [ApiController]
     public class PetsAPIController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IPetsService _individualService;
 
-        public PetsAPIController(DataContext context)
+        public PetsAPIController(IPetsService petsServices)
         {
-            _context = context;
+            _individualService = petsServices;
         }
 
         /// <summary>
@@ -27,9 +28,7 @@ namespace PeopleAndPetsAPI.Controllers
         [HttpGet("pets/owner/{id}")]
         public async Task<ActionResult<List<Pet>>> GetPets(int id)
         {
-            var pets = await _context.Pets.Where(p => p.OwnerId == id).ToListAsync();
-
-            return Ok(pets);
+            return Ok(await _individualService.GetIndividualsAsync(id));
         }
 
         /// <summary>
@@ -40,9 +39,7 @@ namespace PeopleAndPetsAPI.Controllers
         [HttpGet("pets/owner/{id}/{searchTerm}")]
         public async Task<ActionResult<List<Person>>> GetPetsBySearch(int id, string searchTerm)
         {
-            var pets = await _context.Pets.Where(p => p.OwnerId == id && (p.Name.ToLower().Contains(searchTerm.ToLower()) || p.Type.ToLower().Contains(searchTerm.ToLower()))).ToListAsync();
-
-            return Ok(pets);
+            return Ok(await _individualService.GetIndividualsBySearch(id, searchTerm));
         }
 
         /// <summary>
@@ -52,14 +49,14 @@ namespace PeopleAndPetsAPI.Controllers
         [HttpGet("pets/{id}")]
         public async Task<ActionResult<Pet>> GetPet(int id)
         {
-            var pet = await _context.Pets.FindAsync(id);
+            var extractedPet = await _individualService.GetIndividualAsync(id);
 
-            if (pet is null)
+            if (extractedPet is null)
             {
                 return NotFound("Pet not found");
             }
 
-            return Ok(pet);
+            return Ok(extractedPet);
         }
 
         /// <summary>
@@ -67,13 +64,9 @@ namespace PeopleAndPetsAPI.Controllers
         /// </summary>
         /// <param name="pet"></param>
         [HttpPost("pets")]
-        public async Task<ActionResult<Pet>> AddPet(Pet pet)
+        public async Task<ActionResult<IEnumerable<Pet>>> AddPet(Pet pet)
         {
-            _context.Pets.Add(pet);
-            pet = await _context.Pets.FindAsync(pet.Id);
-            await _context.SaveChangesAsync();
-
-            return Ok(pet);
+            return Ok(await _individualService.AddIndividualAsync(pet));
         }
 
         /// <summary>
@@ -81,22 +74,16 @@ namespace PeopleAndPetsAPI.Controllers
         /// </summary>
         /// <param name="pet"></param>
         [HttpPut("pets")]
-        public async Task<ActionResult<List<Pet>>> UpdatePet(Pet pet)
+        public async Task<ActionResult<Pet>> UpdatePet(Pet pet)
         {
-            var dbPet = await _context.Pets.FindAsync(pet.Id);
+            var extractedPet = await _individualService.UpdateIndividualAsync(pet);
 
-            if (dbPet is null)
+            if (extractedPet is null)
             {
                 return NotFound("Pet not found");
             }
 
-            dbPet.Name = pet.Name;
-            dbPet.Type = pet.Type;
-            dbPet.OwnerId = pet.OwnerId;
-
-            await _context.SaveChangesAsync();
-
-            return Ok(pet);
+            return Ok(extractedPet);
         }
 
         /// <summary>
@@ -104,19 +91,16 @@ namespace PeopleAndPetsAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         [HttpDelete("pets/{id}")]
-        public async Task<ActionResult<List<Pet>>> DeletePet(int id)
+        public async Task<ActionResult<IEnumerable<Pet>>> DeletePet(int id)
         {
-            var dbPet = await _context.Pets.FindAsync(id);
+            var extractedPets = await _individualService.DeleteIndividualAsync(id);
 
-            if (dbPet is null)
+            if (extractedPets is null)
             {
                 return NotFound("Pet not found");
             }
 
-            _context.Pets.Remove(dbPet);
-            await _context.SaveChangesAsync();
-
-            return Ok(await _context.Pets.ToListAsync());
+            return Ok(extractedPets);
         }
     }
 }

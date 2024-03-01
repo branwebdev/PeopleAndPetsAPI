@@ -5,7 +5,7 @@ namespace PeopleAndPetsAPI.Entities
     /// <summary>
     /// Represents the schema of the people database table.
     /// </summary>
-    public class Person
+    public class Person : Individual
     {
         /// <summary>
         /// The Id column of the people database table.

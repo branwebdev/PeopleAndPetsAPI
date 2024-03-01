@@ -14,7 +14,7 @@ namespace PeopleAndPetsMVC.Controllers
     /// </summary>
     public class HomeController : Controller
     {
-        Uri baseAddress = new Uri("https://localhost:7265/api");
+        private Uri baseAddress = new Uri("https://localhost:7265/api");
 
         private readonly HttpClient _httpClient;
 

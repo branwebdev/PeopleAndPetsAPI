@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PeopleAndPetsAPI.Data;
 using PeopleAndPetsAPI.Entities;
+using PeopleAndPetsAPI.Services;
 
 namespace PeopleAndPetsAPI.Controllers
 {
@@ -13,11 +14,11 @@ namespace PeopleAndPetsAPI.Controllers
     [ApiController]
     public class PeopleAPIController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IPeopleService _peopleService;
 
-        public PeopleAPIController(DataContext context)
+        public PeopleAPIController(IPeopleService peopleService)
         {
-            _context = context;
+            _peopleService = peopleService;
         }
 
         /// <summary>
@@ -26,9 +27,7 @@ namespace PeopleAndPetsAPI.Controllers
         [HttpGet("people")]
         public async Task<ActionResult<List<Person>>> GetPeople()
         {
-            var people = await _context.People.ToListAsync();
-
-            return Ok(people);
+            return Ok(await _peopleService.GetIndividualsAsync());
         }
 
         /// <summary>
@@ -38,9 +37,7 @@ namespace PeopleAndPetsAPI.Controllers
         [HttpGet("people/{searchTerm}")]
         public async Task<ActionResult<List<Person>>> GetPeopleBySearch(string searchTerm)
         {
-            var people = await _context.People.Where(p => p.Name.ToLower().Contains(searchTerm.ToLower())).ToListAsync();
-
-            return Ok(people);
+            return Ok(await _peopleService.GetIndividualsBySearch(searchTerm));
         }
 
         /// <summary>
@@ -50,14 +47,14 @@ namespace PeopleAndPetsAPI.Controllers
         [HttpGet("people/{id}")]        
         public async Task<ActionResult<Person>> GetPerson(int id)
         {
-            var person = await _context.People.FindAsync(id);
+            var extractedPerson = await _peopleService.GetIndividualAsync(id);
 
-            if(person is null)
+            if(extractedPerson is null)
             {
                 return NotFound("Person not found");
             }
 
-            return Ok(person);
+            return Ok(extractedPerson);
         }
 
         /// <summary>
@@ -65,12 +62,9 @@ namespace PeopleAndPetsAPI.Controllers
         /// </summary>
         /// <param name="person"></param>
         [HttpPost("people")]
-        public async Task<ActionResult<List<Person>>> AddPerson(Person person)
-        {
-            _context.People.Add(person);
-            await _context.SaveChangesAsync();           
-
-            return Ok(await _context.People.ToListAsync());
+        public async Task<ActionResult<IEnumerable<Person>>> AddPerson(Person person)
+        {           
+            return Ok(await _peopleService.AddIndividualAsync(person));
         }
 
         /// <summary>
@@ -78,22 +72,16 @@ namespace PeopleAndPetsAPI.Controllers
         /// </summary>
         /// <param name="person"></param>
         [HttpPut("people")]
-        public async Task<ActionResult<List<Person>>> UpdatePerson(Person person)
+        public async Task<ActionResult<Person>> UpdatePerson(Person person)
         {
-            var dbPerson = await _context.People.FindAsync(person.Id);
+            var extractedPerson = await _peopleService.UpdateIndividualAsync(person);
 
-            if (dbPerson is null)
+            if (extractedPerson is null)
             {
                 return NotFound("Person not found");
             }
 
-            dbPerson.Name = person.Name;
-            dbPerson.Gender = person.Gender;
-            dbPerson.Age = person.Age;
-
-            await _context.SaveChangesAsync();
-
-            return Ok(person);
+            return Ok(extractedPerson as Individual);
         }
 
         /// <summary>
@@ -101,21 +89,16 @@ namespace PeopleAndPetsAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         [HttpDelete("people/{id}")]
-        public async Task<ActionResult<List<Person>>> DeletePerson(int id)
+        public async Task<ActionResult<IEnumerable<Person>>> DeletePerson(int id)
         {
-            var dbPerson = await _context.People.FindAsync(id);
+            var extractedPeople = await _peopleService.DeleteIndividualAsync(id);
 
-            if (dbPerson is null)
+            if (extractedPeople is null)
             {
                 return NotFound("Person not found");
             }
 
-            var dbPersonPets = await _context.Pets.Where(p => p.OwnerId == id).ToListAsync();
-            _context.Pets.RemoveRange(dbPersonPets);
-            _context.People.Remove(dbPerson);
-            await _context.SaveChangesAsync();
-
-            return Ok(await _context.People.ToListAsync());
+            return Ok(extractedPeople);
         }        
     }
 }
