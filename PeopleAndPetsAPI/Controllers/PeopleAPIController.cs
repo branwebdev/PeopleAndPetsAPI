@@ -25,7 +25,7 @@ namespace PeopleAndPetsAPI.Controllers
         /// Gets the full list of pet owners from the database and returns them to the client side.
         /// </summary>
         [HttpGet("people")]
-        public async Task<ActionResult<List<Person>>> GetPeople()
+        public async Task<ActionResult<IEnumerable<Person>>> GetPeople()
         {
             return Ok(await _peopleService.GetIndividualsAsync());
         }
@@ -35,7 +35,7 @@ namespace PeopleAndPetsAPI.Controllers
         /// </summary>
         /// <param name="searchTerm"></param>
         [HttpGet("people/{searchTerm}")]
-        public async Task<ActionResult<List<Person>>> GetPeopleBySearch(string searchTerm)
+        public async Task<ActionResult<IEnumerable<Person>>> GetPeopleBySearch(string searchTerm)
         {
             return Ok(await _peopleService.GetIndividualsBySearch(searchTerm));
         }
@@ -62,9 +62,16 @@ namespace PeopleAndPetsAPI.Controllers
         /// </summary>
         /// <param name="person"></param>
         [HttpPost("people")]
-        public async Task<ActionResult<IEnumerable<Person>>> AddPerson(Person person)
-        {           
-            return Ok(await _peopleService.AddIndividualAsync(person));
+        public async Task<ActionResult> AddPerson(Person person)
+        {
+            var extractedPerson = await _peopleService.AddIndividualAsync(person);
+
+            if(extractedPerson is null)
+            {
+                return NotFound("Person not added");
+            }
+
+            return Ok();
         }
 
         /// <summary>
@@ -72,7 +79,7 @@ namespace PeopleAndPetsAPI.Controllers
         /// </summary>
         /// <param name="person"></param>
         [HttpPut("people")]
-        public async Task<ActionResult<Person>> UpdatePerson(Person person)
+        public async Task<ActionResult> UpdatePerson(Person person)
         {
             var extractedPerson = await _peopleService.UpdateIndividualAsync(person);
 
@@ -81,7 +88,7 @@ namespace PeopleAndPetsAPI.Controllers
                 return NotFound("Person not found");
             }
 
-            return Ok(extractedPerson as Individual);
+            return Ok();
         }
 
         /// <summary>
@@ -89,16 +96,16 @@ namespace PeopleAndPetsAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         [HttpDelete("people/{id}")]
-        public async Task<ActionResult<IEnumerable<Person>>> DeletePerson(int id)
+        public async Task<ActionResult> DeletePerson(int id)
         {
-            var extractedPeople = await _peopleService.DeleteIndividualAsync(id);
+            var extractedPerson = await _peopleService.DeleteIndividualAsync(id);
 
-            if (extractedPeople is null)
+            if (extractedPerson is null)
             {
                 return NotFound("Person not found");
             }
 
-            return Ok(extractedPeople);
+            return Ok();
         }        
     }
 }

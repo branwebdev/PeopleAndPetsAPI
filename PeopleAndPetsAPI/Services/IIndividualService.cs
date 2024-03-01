@@ -10,10 +10,10 @@ namespace PeopleAndPetsAPI.Services
     {
         public Task<Individual> GetIndividualAsync(int id);
 
-        public Task<IEnumerable<Individual>> AddIndividualAsync(Individual individual);
+        public Task<Individual> AddIndividualAsync(Individual individual);
 
         public Task<Individual> UpdateIndividualAsync(Individual individual);
 
-        public Task<IEnumerable<Individual>> DeleteIndividualAsync(int id);
+        public Task<Individual> DeleteIndividualAsync(int id);
     }
 }

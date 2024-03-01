@@ -26,7 +26,7 @@ namespace PeopleAndPetsAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         [HttpGet("pets/owner/{id}")]
-        public async Task<ActionResult<List<Pet>>> GetPets(int id)
+        public async Task<ActionResult<IEnumerable<Pet>>> GetPets(int id)
         {
             return Ok(await _individualService.GetIndividualsAsync(id));
         }
@@ -37,7 +37,7 @@ namespace PeopleAndPetsAPI.Controllers
         /// <param name="id"></param>
         /// <param name="searchTerm"></param>
         [HttpGet("pets/owner/{id}/{searchTerm}")]
-        public async Task<ActionResult<List<Person>>> GetPetsBySearch(int id, string searchTerm)
+        public async Task<ActionResult<IEnumerable<Pet>>> GetPetsBySearch(int id, string searchTerm)
         {
             return Ok(await _individualService.GetIndividualsBySearch(id, searchTerm));
         }
@@ -64,9 +64,16 @@ namespace PeopleAndPetsAPI.Controllers
         /// </summary>
         /// <param name="pet"></param>
         [HttpPost("pets")]
-        public async Task<ActionResult<IEnumerable<Pet>>> AddPet(Pet pet)
+        public async Task<ActionResult> AddPet(Pet pet)
         {
-            return Ok(await _individualService.AddIndividualAsync(pet));
+            var extractedPet = await _individualService.AddIndividualAsync(pet);
+
+            if (extractedPet is null)
+            {
+                return NotFound("Pet not added");
+            }
+
+            return Ok();
         }
 
         /// <summary>
@@ -91,16 +98,16 @@ namespace PeopleAndPetsAPI.Controllers
         /// </summary>
         /// <param name="id"></param>
         [HttpDelete("pets/{id}")]
-        public async Task<ActionResult<IEnumerable<Pet>>> DeletePet(int id)
+        public async Task<ActionResult> DeletePet(int id)
         {
-            var extractedPets = await _individualService.DeleteIndividualAsync(id);
+            var extractedPet = await _individualService.DeleteIndividualAsync(id);
 
-            if (extractedPets is null)
+            if (extractedPet is null)
             {
                 return NotFound("Pet not found");
             }
 
-            return Ok(extractedPets);
+            return Ok();
         }
     }
 }

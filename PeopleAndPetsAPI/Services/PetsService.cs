@@ -13,14 +13,18 @@ namespace PeopleAndPetsAPI.Services
             _context = context;    
         }
 
-        public async Task<IEnumerable<Individual>> AddIndividualAsync(Individual individual)
+        public async Task<Individual> AddIndividualAsync(Individual individual)
         {
-            _context.Pets.Add(individual as Pet);
+            var pet = individual as Pet;
+            _context.Pets.Add(pet);
             await _context.SaveChangesAsync();
-            return await _context.Pets.ToListAsync();
+
+            var dbPet = await _context.Pets.FindAsync(pet.Id);
+
+            return dbPet;
         }
 
-        public async Task<IEnumerable<Individual>> DeleteIndividualAsync(int id)
+        public async Task<Individual> DeleteIndividualAsync(int id)
         {
             var dbPet = await _context.Pets.FindAsync(id);
 
@@ -32,7 +36,7 @@ namespace PeopleAndPetsAPI.Services
             _context.Pets.Remove(dbPet);
             await _context.SaveChangesAsync();
 
-            return await _context.Pets.ToListAsync();
+            return dbPet;
         }
 
         public async Task<Individual> GetIndividualAsync(int id)
