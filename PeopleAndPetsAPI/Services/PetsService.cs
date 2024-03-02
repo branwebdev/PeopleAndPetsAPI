@@ -4,6 +4,9 @@ using PeopleAndPetsAPI.Entities;
 
 namespace PeopleAndPetsAPI.Services
 {
+    /// <summary>
+    /// This is the Pets Service that interacts with the pets database table.
+    /// </summary>
     public class PetsService : IPetsService
     {
         private readonly DataContext _context;
@@ -13,6 +16,11 @@ namespace PeopleAndPetsAPI.Services
             _context = context;    
         }
 
+        /// <summary>
+        /// Adds the pet to the database
+        /// </summary>
+        /// <param name="individual"></param>
+        /// <returns></returns>
         public async Task<Individual> AddIndividualAsync(Individual individual)
         {
             var pet = individual as Pet;
@@ -24,6 +32,11 @@ namespace PeopleAndPetsAPI.Services
             return dbPet;
         }
 
+        /// <summary>
+        /// Deletes the pet from the database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<Individual> DeleteIndividualAsync(int id)
         {
             var dbPet = await _context.Pets.FindAsync(id);
@@ -39,21 +52,42 @@ namespace PeopleAndPetsAPI.Services
             return dbPet;
         }
 
+        /// <summary>
+        /// Gets the pet from the database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<Individual> GetIndividualAsync(int id)
         {
             return await _context.Pets.FindAsync(id);
         }
 
+        /// <summary>
+        /// Gets the pets from the database for that specific owner
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Individual>> GetIndividualsAsync(int id)
         {
             return await _context.Pets.Where(p => p.OwnerId == id).ToListAsync();
         }
 
+        /// <summary>
+        /// Gets the pets from the database using a search term and pet owner Id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="searchTerm"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Individual>> GetIndividualsBySearch(int id, string searchTerm)
         {
             return await _context.Pets.Where(p => p.OwnerId == id && (p.Name.ToLower().Contains(searchTerm.ToLower()) || p.Type.ToLower().Contains(searchTerm.ToLower()))).ToListAsync();
         }
 
+        /// <summary>
+        /// Updates the existing pet within the database
+        /// </summary>
+        /// <param name="individual"></param>
+        /// <returns></returns>
         public async Task<Individual> UpdateIndividualAsync(Individual individual)
         {
             Pet pet = individual as Pet;

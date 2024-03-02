@@ -5,6 +5,9 @@ using System;
 
 namespace PeopleAndPetsAPI.Services
 {
+    /// <summary>
+    /// This is the People Service that interacts with the people database table.
+    /// </summary>
     public class PeopleService : IPeopleService
     {
         private readonly DataContext _context;
@@ -14,6 +17,11 @@ namespace PeopleAndPetsAPI.Services
             _context = context;
         }
 
+        /// <summary>
+        /// Adds the people into the database
+        /// </summary>
+        /// <param name="individual"></param>
+        /// <returns></returns>
         public async Task<Individual> AddIndividualAsync(Individual individual)
         {
             var person = individual as Person;
@@ -25,6 +33,11 @@ namespace PeopleAndPetsAPI.Services
             return dbPerson;
         }
 
+        /// <summary>
+        /// Deletes the person from the database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<Individual> DeleteIndividualAsync(int id)
         {
             var dbPerson = await _context.People.FindAsync(id);
@@ -47,6 +60,11 @@ namespace PeopleAndPetsAPI.Services
             return dbPerson;
         }
 
+        /// <summary>
+        /// Gets the person from the database using the person's Id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public async Task<Individual> GetIndividualAsync(int id)
         {
             var person = await _context.People.FindAsync(id);
@@ -54,6 +72,10 @@ namespace PeopleAndPetsAPI.Services
             return person;
         }
 
+        /// <summary>
+        /// Gets all the people from the database.
+        /// </summary>
+        /// <returns></returns>
         public async Task<IEnumerable<Individual>> GetIndividualsAsync()
         {
             var people = await _context.People.ToListAsync();
@@ -61,6 +83,11 @@ namespace PeopleAndPetsAPI.Services
             return people;
         }
 
+        /// <summary>
+        /// Gets all the people from the database using the search term.
+        /// </summary>
+        /// <param name="searchTerm"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Individual>> GetIndividualsBySearch(string searchTerm)
         {
             var people = await _context.People.Where(p => p.Name.ToLower().Contains(searchTerm.ToLower())).ToListAsync();
@@ -68,6 +95,11 @@ namespace PeopleAndPetsAPI.Services
             return people;
         }
 
+        /// <summary>
+        /// Updates the person to the database.
+        /// </summary>
+        /// <param name="individual"></param>
+        /// <returns></returns>
         public async Task<Individual> UpdateIndividualAsync(Individual individual)
         {
             Person person = individual as Person;
